@@ -18,7 +18,7 @@ public class ModEntities {
 
   public static void register(BiConsumer<EntityType<?>, ResourceLocation> consumer) {
     SPECTER = EntityType.Builder.<Specter>of(Specter::new, MobCategory.AMBIENT).sized(0.9F, 0.5F).clientTrackingRange(8).build(SPECTER_ID.toString());
-    RAW_SPECTER = EntityType.Builder.<RawSpecter>of(RawSpecter::new, MobCategory.AMBIENT).sized(0.0625F * 2f, 0.0625F * 2f).clientTrackingRange(8).build(RAW_SPECTER_ID.toString());
+    RAW_SPECTER = EntityType.Builder.<RawSpecter>of(RawSpecter::new, MobCategory.AMBIENT).sized(0.0625F * 6f, 0.0625F * 6f).clientTrackingRange(8).build(RAW_SPECTER_ID.toString());
     consumer.accept(SPECTER, SPECTER_ID);
     consumer.accept(RAW_SPECTER, RAW_SPECTER_ID);
   }

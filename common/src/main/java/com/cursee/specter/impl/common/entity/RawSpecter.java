@@ -52,23 +52,43 @@ public class RawSpecter extends AbstractRawSpecter {
   @Override
   protected InteractionResult mobInteract(Player player, InteractionHand hand) {
 
-    if (Services.PLATFORM.isDevelopmentEnvironment()) {
-      Level level = player.level();
-      boolean isClientSide = level.isClientSide();
-      Constants.LOG.info("Called mobInteract on a RawSpecter instance with the following values:");
-      Constants.LOG.info("isClientSide ? {}", isClientSide);
-      Constants.LOG.info("hand ? {}", hand.name());
-    }
-
     // if player interacting with unowned specter
     // create new raw specter owned by the player and move to player location
-    if (this.getOwner() == null) {
+    if (!this.level().isClientSide() && hand == InteractionHand.MAIN_HAND && this.getOwner() == null) {
       var specter = new RawSpecter(this.level(), player);
       specter.moveTo(player.position());
       this.level().addFreshEntity(specter);
     }
 
     return super.mobInteract(player, hand);
+  }
+
+  private void handleLookingAtPlayer() {
+
+    float maxRotDegrees = 8.0f;
+
+    if (this.getOwner() != null) {
+
+      Vec3 targetPositionDelta = new Vec3(this.getOwner().getX() - this.getX(), this.getOwner().getY() + (double)this.getOwner().getEyeHeight() + 0.25f - this.getY(), this.getOwner().getZ() - this.getZ());
+
+      double targetPosDeltaSquared = targetPositionDelta.lengthSqr();
+
+      // if player farther than 4 blocks (2*2 = 4), increase max rotation degrees, otherwise lower
+      if (targetPosDeltaSquared > (double)16.0f) {
+
+        // player farther than 4 blocks
+
+        maxRotDegrees = 16.0f;
+      }
+//      else if (targetPosDeltaSquared < (double)8.0f) {
+//
+//        // player closer than ~3 blocks
+//
+//        maxRotDegrees = 1.5f;
+//      }
+
+      this.lookAt(this.getOwner(), maxRotDegrees, maxRotDegrees);
+    }
   }
 
   @Override
@@ -80,9 +100,7 @@ public class RawSpecter extends AbstractRawSpecter {
     this.yo = this.getY();
     this.zo = this.getZ();
 
-    if (this.getOwner() != null) {
-      this.lookAt(this.getOwner(), 2f, 2f);
-    }
+    this.handleLookingAtPlayer();
 
     // this was for a raw entity, but LivingEntity handles gravity now, as we extend from Mob
 //    // apply water movement dampening or gravity if not in water
@@ -111,9 +129,21 @@ public class RawSpecter extends AbstractRawSpecter {
     if (this.getOwner() != null) {
 
       // vector pointing from this entity toward its owner's position
-      Vec3 targetPositionDelta = new Vec3(this.getOwner().getX() - this.getX(), this.getOwner().getY() + (double)this.getOwner().getEyeHeight() / (double)2.0F - this.getY(), this.getOwner().getZ() - this.getZ());
+
+      // experience points target center-mass of the player
+      // Vec3 targetPositionDelta = new Vec3(this.getOwner().getX() - this.getX(), this.getOwner().getY() + (double)this.getOwner().getEyeHeight() / (double)2.0F - this.getY(), this.getOwner().getZ() - this.getZ());
+
+      // we are targeting slightly above the player's eye height
+      Vec3 targetPositionDelta = new Vec3(this.getOwner().getX() - this.getX(), this.getOwner().getY() + (double)this.getOwner().getEyeHeight() + 0.25f - this.getY(), this.getOwner().getZ() - this.getZ());
 
       double targetPosDeltaSquared = targetPositionDelta.lengthSqr();
+
+      double movementDampening = 1.0f;
+
+      // if player is closer than ~3 blocks, dampen movement
+      if (targetPosDeltaSquared < 8.0f) {
+        movementDampening = 0.5f;
+      }
 
       // if player within 16 blocks (16*16 = 256)
       // if (targetPosDeltaSquared < (double)256.0F) {
@@ -124,7 +154,7 @@ public class RawSpecter extends AbstractRawSpecter {
         // smooth falloff in pull strength as the entity gets farther from the owner.
         // double movementDampening = (double)1.0F - Math.sqrt(targetPosDeltaSquared) / (double)8.0F; // original
 
-        double movementDampening = 1.0f; // ??? no dampening
+        // double movementDampening = 1.0f; // ??? no dampening
 
         // double movementDampening = -((double)1.0F - Math.sqrt(targetPosDeltaSquared) / (double)8.0F); // inverse ?? slow as we get closer ?
 

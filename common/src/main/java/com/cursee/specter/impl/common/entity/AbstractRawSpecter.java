@@ -1,5 +1,7 @@
 package com.cursee.specter.impl.common.entity;
 
+import com.cursee.specter.Constants;
+import com.cursee.specter.platform.Services;
 import java.util.Optional;
 import java.util.UUID;
 import net.minecraft.commands.arguments.EntityAnchorArgument.Anchor;
@@ -81,17 +83,38 @@ public abstract class AbstractRawSpecter extends Mob implements TraceableEntity 
   }
 
   public void scanForEntities() {
-    if (this.owner == null || this.owner.distanceToSqr(this) > (double)4.0f) {
+    // if (this.owner == null || this.owner.distanceToSqr(this) > (double)4.0f) {
+    if (this.owner == null) {
+
+      if (Services.PLATFORM.isDevelopmentEnvironment() && this.level().isClientSide()) {
+        Constants.LOG.info("Missing owner on client, searching...");
+      }
 
       // ExperienceOrb sets followingPlayer to the nearest available player
       // this.owner = this.level().getNearestPlayer(this, (double)8.0F);
 
       // we are checking against every alive player's UUID
-      this.getOwnerId().ifPresent(uuid -> this.level().players().forEach(player -> {
-        if (uuid.equals(player.getUUID()) && !(player.isSpectator() || player.isDeadOrDying())) {
-          this.setOwner(player);
+      this.getOwnerId().ifPresent(uuid -> {
+
+        if (Services.PLATFORM.isDevelopmentEnvironment() && this.level().isClientSide()) {
+          Constants.LOG.info("Owner UUID present on client, still searching...");
         }
-      }));
+
+        this.level().players().forEach(player -> {
+
+          UUID playerId = player.getUUID();
+
+          if (uuid.equals(playerId) && !(player.isSpectator() || player.isDeadOrDying())) {
+
+            if (Services.PLATFORM.isDevelopmentEnvironment() && this.level().isClientSide()) {
+              Constants.LOG.info("Found player with UUID matching synced owner's UUID, {}", uuid);
+              Constants.LOG.info("Setting owner on client.");
+            }
+
+            this.setOwner(player);
+          }
+        });
+      });
     }
   }
 

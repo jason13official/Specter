@@ -54,12 +54,18 @@ public class RawSpecterRenderer extends EntityRenderer<AbstractRawSpecter> imple
 
     // rotating to face look direction copied from BoatRenderer.class
     poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - entityYaw));
+    // poseStack.mulPose(Axis.YP.rotationDegrees(entityYaw));
+
+    // poseStack.mulPose(Axis.XP.rotationDegrees(180.0F - specter.getViewYRot(1.0f)));
+    poseStack.mulPose(Axis.XP.rotationDegrees(180.0f - specter.getViewXRot(1.0f)));
 
     // flipping x-axis and y-axis copied from BoatRenderer.class
     poseStack.scale(-1.0F, -1.0F, 1.0F);
 
+    this.getModel().setupAnim(specter, partialTick, 0.0F, -0.1F, 0.0F, 0.0F);
+
     // call to render method defined by our model
-    getModel().renderToBuffer(poseStack, buffer.getBuffer(RenderType.entityCutout(this.getTextureLocation(specter))), packedLight, OverlayTexture.NO_OVERLAY, 1, 1, 1, 1);
+    this.getModel().renderToBuffer(poseStack, buffer.getBuffer(RenderType.entityTranslucentCull(this.getTextureLocation(specter))), packedLight, OverlayTexture.NO_OVERLAY, 1, 1, 1, 1);
 
     poseStack.popPose();
 
