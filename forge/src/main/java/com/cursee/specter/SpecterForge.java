@@ -1,5 +1,6 @@
 package com.cursee.specter;
 
+import com.cursee.specter.impl.common.entity.Specter;
 import com.cursee.specter.impl.common.registry.ModEntities;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -9,10 +10,12 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
+import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -35,6 +38,8 @@ public class SpecterForge {
     if (FMLLoader.getDist() == Dist.CLIENT) {
       new SpecterClientForge();
     }
+
+    SpecterForge.eventBus.addListener((Consumer<EntityAttributeCreationEvent>) event -> event.put(ModEntities.SPECTER, Specter.createMobAttributes().build()));
 
     MinecraftForge.EVENT_BUS.addListener((Consumer<ServerStartingEvent>) event -> SpecterServer.onServerStarting(event.getServer()));
     MinecraftForge.EVENT_BUS.addListener((Consumer<ServerStartedEvent>) event -> SpecterServer.onServerStarted(event.getServer()));
