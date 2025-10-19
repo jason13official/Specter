@@ -17,7 +17,7 @@ license = "${license}" # Review your options at https://choosealicense.com/.
 [[dependencies.${mod_id}]] #optional
     modId = "forge" #mandatory
     mandatory = true #mandatory
-    versionRange = "[${forge_version},)" #mandatory
+    versionRange = "[47.0.0,)" #mandatory # TODO this should be the minimal version that the mod is allowed to run on, but we compiling against a newer version of MinecraftForge
     ordering = "NONE" # The order that this dependency should load in relation to your mod, required to be either 'BEFORE' or 'AFTER' if the dependency is not mandatory
     side = "BOTH" # Side this dependency is applied on - 'BOTH', 'CLIENT' or 'SERVER'
 
