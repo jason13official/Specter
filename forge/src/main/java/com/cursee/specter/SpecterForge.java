@@ -44,7 +44,10 @@ public class SpecterForge {
     }
 
     // before integrated/dedicated server launch
-    SpecterForge.eventBus.addListener((Consumer<EntityAttributeCreationEvent>) event -> event.put(ModEntities.SPECTER, Specter.createAttributes().build()));
+    SpecterForge.eventBus.addListener((Consumer<EntityAttributeCreationEvent>) event -> {
+      event.put(ModEntities.SPECTER, Specter.createAttributes().build());
+      event.put(ModEntities.RAW_SPECTER, Specter.createAttributes().build());
+    });
 
     MinecraftForge.EVENT_BUS.addListener((Consumer<ServerStartingEvent>) event -> SpecterServer.onServerStarting(event.getServer()));
     MinecraftForge.EVENT_BUS.addListener((Consumer<ServerStartedEvent>) event -> SpecterServer.onServerStarted(event.getServer()));

@@ -1,6 +1,8 @@
 package com.cursee.specter;
 
+import com.cursee.specter.impl.client.model.RawSpecterModel;
 import com.cursee.specter.impl.client.model.SpecterModel;
+import com.cursee.specter.impl.client.renderer.entity.RawSpecterRenderer;
 import com.cursee.specter.impl.client.renderer.entity.SpecterRenderer;
 import com.cursee.specter.impl.common.registry.ModEntities;
 import net.fabricmc.api.ClientModInitializer;
@@ -15,7 +17,9 @@ public class SpecterClientFabric implements ClientModInitializer {
     SpecterClient.init();
 
     EntityModelLayerRegistry.registerModelLayer(SpecterRenderer.LAYER_LOCATION, SpecterModel::createBodyLayer);
+    EntityModelLayerRegistry.registerModelLayer(RawSpecterRenderer.LAYER_LOCATION, RawSpecterModel::createBodyLayer);
 
     EntityRendererRegistry.register(ModEntities.SPECTER, SpecterRenderer::new);
+    EntityRendererRegistry.register(ModEntities.RAW_SPECTER, RawSpecterRenderer::new);
   }
 }
