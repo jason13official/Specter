@@ -8,9 +8,11 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.event.server.ServerStoppedEvent;
@@ -29,8 +31,10 @@ public class SpecterForge {
 
   public SpecterForge(final FMLJavaModLoadingContext context) {
 
+    // leave this at the top of the constructor
     SpecterForge.eventBus = context.getModEventBus();
 
+    // bind before common init
     bind(Registries.ENTITY_TYPE, ModEntities::register);
 
     SpecterCommon.init();
@@ -39,10 +43,19 @@ public class SpecterForge {
       new SpecterClientForge();
     }
 
-    SpecterForge.eventBus.addListener((Consumer<EntityAttributeCreationEvent>) event -> event.put(ModEntities.SPECTER, Specter.createMobAttributes().build()));
+    // before integrated/dedicated server launch
+    SpecterForge.eventBus.addListener((Consumer<EntityAttributeCreationEvent>) event -> event.put(ModEntities.SPECTER, Specter.createAttributes().build()));
 
     MinecraftForge.EVENT_BUS.addListener((Consumer<ServerStartingEvent>) event -> SpecterServer.onServerStarting(event.getServer()));
     MinecraftForge.EVENT_BUS.addListener((Consumer<ServerStartedEvent>) event -> SpecterServer.onServerStarted(event.getServer()));
+
+    // server running events
+    MinecraftForge.EVENT_BUS.addListener((Consumer<EntityJoinLevelEvent>) event -> {
+      if (event.getLevel() instanceof ServerLevel serverLevel) {
+        SpecterServer.onEntityJoinServerLevel(event.getEntity(), serverLevel);
+      }
+    });
+
     MinecraftForge.EVENT_BUS.addListener((Consumer<ServerStoppingEvent>) event -> SpecterServer.onServerStopping(event.getServer()));
     MinecraftForge.EVENT_BUS.addListener((Consumer<ServerStoppedEvent>) event -> SpecterServer.onServerStopped(event.getServer()));
   }

@@ -11,7 +11,7 @@ public class SpecterClientFabric implements ClientModInitializer {
 
   @Override
   public void onInitializeClient() {
-    
+
     SpecterClient.init();
 
     EntityModelLayerRegistry.registerModelLayer(SpecterRenderer.LAYER_LOCATION, SpecterModel::createBodyLayer);

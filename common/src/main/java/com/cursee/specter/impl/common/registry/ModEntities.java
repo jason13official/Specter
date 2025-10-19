@@ -13,7 +13,7 @@ public class ModEntities {
   public static EntityType<Specter> SPECTER;
 
   public static void register(BiConsumer<EntityType<?>, ResourceLocation> consumer) {
-    SPECTER = EntityType.Builder.<Specter>of(Specter::new, MobCategory.AMBIENT).build(SPECTER_ID.toString());
+    SPECTER = EntityType.Builder.<Specter>of(Specter::new, MobCategory.AMBIENT).sized(0.9F, 0.5F).clientTrackingRange(8).build(SPECTER_ID.toString());
     consumer.accept(SPECTER, SPECTER_ID);
   }
 }
