@@ -73,6 +73,21 @@ public abstract class AbstractRawSpecter extends Mob implements TraceableEntity 
   }
 
   @Override
+  public boolean isPickable() {
+    return true;
+  }
+
+  @Override
+  public boolean canBeCollidedWith() {
+    return false;
+  }
+
+  @Override
+  public boolean canCollideWith(Entity entity) {
+    return entity instanceof AbstractRawSpecter;
+  }
+
+  @Override
   public @Nullable LivingEntity getOwner() {
     return this.owner;
   }

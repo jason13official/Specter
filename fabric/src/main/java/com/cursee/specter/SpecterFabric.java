@@ -2,6 +2,7 @@ package com.cursee.specter;
 
 import com.cursee.specter.impl.common.entity.Specter;
 import com.cursee.specter.impl.common.registry.ModEntities;
+import com.cursee.specter.impl.common.registry.ModItems;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import net.fabricmc.api.ModInitializer;
@@ -22,6 +23,7 @@ public class SpecterFabric implements ModInitializer {
   public void onInitialize() {
 
     // bind before common init
+    bind(BuiltInRegistries.ITEM, ModItems::register);
     bind(BuiltInRegistries.ENTITY_TYPE, ModEntities::register);
 
     SpecterCommon.init();

@@ -21,11 +21,6 @@ public class RawSpecter extends AbstractRawSpecter {
   }
 
   @Override
-  public boolean isPickable() {
-    return true;
-  }
-
-  @Override
   protected InteractionResult mobInteract(Player player, InteractionHand hand) {
 
     // if player interacting with unowned specter
