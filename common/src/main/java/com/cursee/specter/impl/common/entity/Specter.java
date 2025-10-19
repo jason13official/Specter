@@ -1,6 +1,5 @@
 package com.cursee.specter.impl.common.entity;
 
-import com.cursee.specter.api.server.specter.SpecterApi;
 import com.cursee.specter.impl.common.registry.ModEntities;
 import java.util.Comparator;
 import java.util.EnumSet;
@@ -67,8 +66,7 @@ public class Specter extends FlyingMob implements TraceableEntity {
     this.moveControl = new Specter.SpecterMoveControl(this);
     this.lookControl = new SpecterLookControl(this);
   }
-
-  /// Creates a Specter owned by a ServerPlayer for {@link SpecterApi}
+  
   public Specter(ServerLevel level, ServerPlayer player) {
     this(ModEntities.SPECTER, level);
     this.owner = player;
@@ -244,6 +242,16 @@ public class Specter extends FlyingMob implements TraceableEntity {
     CIRCLE, SWOOP
   }
 
+  static class SpecterLookControl extends LookControl {
+
+    public SpecterLookControl(Mob mob) {
+      super(mob);
+    }
+
+    public void tick() {
+    }
+  }
+
   class SpecterAttackPlayerTargetGoal extends Goal {
 
     private final TargetingConditions attackTargeting = TargetingConditions.forCombat().range(64.0F);
@@ -392,18 +400,7 @@ public class Specter extends FlyingMob implements TraceableEntity {
       }
 
       this.angle += this.clockwise * 15.0F * ((float) Math.PI / 180F);
-      Specter.this.moveTargetPoint = Vec3.atLowerCornerOf(Specter.this.anchorPoint)
-          .add(this.distance * Mth.cos(this.angle), -4.0F + this.height, this.distance * Mth.sin(this.angle));
-    }
-  }
-
-  static class SpecterLookControl extends LookControl {
-
-    public SpecterLookControl(Mob mob) {
-      super(mob);
-    }
-
-    public void tick() {
+      Specter.this.moveTargetPoint = Vec3.atLowerCornerOf(Specter.this.anchorPoint).add(this.distance * Mth.cos(this.angle), -4.0F + this.height, this.distance * Mth.sin(this.angle));
     }
   }
 
