@@ -8,7 +8,7 @@
         "AllayMixin",
         "LivingEntityMixin",
         "EntityPersistentDataMixin",
-        "ServerPlayerMixin"
+        "ServerPlayerPersistentDataMixin"
     ],
     "client": [
         "MinecraftMixin"

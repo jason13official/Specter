@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerPlayer.class)
-public class ServerPlayerMixin {
+public class ServerPlayerPersistentDataMixin {
 
   @Inject(at = @At("TAIL"), method = "restoreFrom")
   private void specter$restoreFrom(ServerPlayer that, boolean keepEverything, CallbackInfo ci) {
