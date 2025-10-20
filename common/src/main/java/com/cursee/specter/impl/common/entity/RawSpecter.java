@@ -28,13 +28,13 @@ public class RawSpecter extends AbstractRawSpecter {
   @Override
   protected InteractionResult mobInteract(Player player, InteractionHand hand) {
 
-    // if player interacting with unowned specter
-    // create new raw specter owned by the player and move to player location
-    if (!this.level().isClientSide() && hand == InteractionHand.MAIN_HAND && this.getOwner() == null) {
-      var specter = new RawSpecter(this.level(), player);
-      specter.moveTo(player.position());
-      this.level().addFreshEntity(specter);
-    }
+//    // if player interacting with unowned specter
+//    // create new raw specter owned by the player and move to player location
+//    if (!this.level().isClientSide() && hand == InteractionHand.MAIN_HAND && this.getOwner() == null) {
+//      var specter = new RawSpecter(this.level(), player);
+//      specter.moveTo(player.position());
+//      this.level().addFreshEntity(specter);
+//    }
 
     return super.mobInteract(player, hand);
   }
