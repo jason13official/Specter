@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entity.class)
-public class LivingEntityPersistentDataMixin implements PersistentDataHolder {
+public class EntityPersistentDataMixin implements PersistentDataHolder {
 
   @Unique
   private CompoundTag specter$persistentData;

@@ -7,7 +7,7 @@
     "mixins": [
         "AllayMixin",
         "LivingEntityMixin",
-        "LivingEntityPersistentDataMixin",
+        "EntityPersistentDataMixin",
         "ServerPlayerMixin"
     ],
     "client": [
