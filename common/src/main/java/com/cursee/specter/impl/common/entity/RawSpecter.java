@@ -9,6 +9,9 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -23,6 +26,10 @@ public class RawSpecter extends AbstractRawSpecter {
   public RawSpecter(Level level, @Nullable LivingEntity owner) {
     this(ModEntities.RAW_SPECTER, level);
     this.setOwner(owner);
+  }
+
+  public static AttributeSupplier.Builder createAttributes() {
+    return Mob.createMobAttributes().add(Attributes.ATTACK_DAMAGE);
   }
 
   @Override
