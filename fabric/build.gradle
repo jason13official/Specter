@@ -12,6 +12,9 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
     implementation project(":common")
+
+    modImplementation 'maven.modrinth:cloth-config:11.1.136+fabric'
+    modImplementation 'maven.modrinth:lootr:0.7.35.85-fabric'
 }
 
 loom {

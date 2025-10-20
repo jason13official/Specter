@@ -3,6 +3,7 @@ package com.cursee.specter;
 import com.cursee.specter.impl.common.entity.Specter;
 import com.cursee.specter.impl.common.registry.ModEntities;
 import com.cursee.specter.impl.common.registry.ModItems;
+import com.cursee.specter.impl.forge.common.loot.ForgeLootModifiers;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import net.minecraft.core.Registry;
@@ -61,6 +62,9 @@ public class SpecterForge {
 
     MinecraftForge.EVENT_BUS.addListener((Consumer<ServerStoppingEvent>) event -> SpecterServer.onServerStopping(event.getServer()));
     MinecraftForge.EVENT_BUS.addListener((Consumer<ServerStoppedEvent>) event -> SpecterServer.onServerStopped(event.getServer()));
+
+    // loader specifics
+    ForgeLootModifiers.register(SpecterForge.eventBus);
   }
 
   @Deprecated(forRemoval = true, since = "1.21.1")
