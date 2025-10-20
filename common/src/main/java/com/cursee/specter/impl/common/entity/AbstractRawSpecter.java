@@ -93,7 +93,7 @@ public abstract class AbstractRawSpecter extends Mob implements TraceableEntity 
   }
 
   public void setOwner(@Nullable LivingEntity newOwner) {
-    if (newOwner != null) {
+    if (newOwner != null && !newOwner.isDeadOrDying()) {
       this.owner = newOwner;
       this.setOwnerId(newOwner.getUUID());
     }
