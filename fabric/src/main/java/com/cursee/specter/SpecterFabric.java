@@ -1,6 +1,6 @@
 package com.cursee.specter;
 
-import com.cursee.specter.impl.common.entity.RawSpecter;
+import com.cursee.specter.impl.common.entity.Specter;
 import com.cursee.specter.impl.common.registry.ModEntities;
 import com.cursee.specter.impl.common.registry.ModItems;
 import java.util.function.BiConsumer;
@@ -29,7 +29,7 @@ public class SpecterFabric implements ModInitializer {
     SpecterCommon.init();
 
     // before integrated/dedicated server launch
-    FabricDefaultAttributeRegistry.register(ModEntities.RAW_SPECTER, RawSpecter.createAttributes());
+    FabricDefaultAttributeRegistry.register(ModEntities.SPECTER, Specter.createAttributes());
 
     ServerLifecycleEvents.SERVER_STARTING.register(SpecterServer::onServerStarting);
     ServerLifecycleEvents.SERVER_STARTED.register(SpecterServer::onServerStarted);

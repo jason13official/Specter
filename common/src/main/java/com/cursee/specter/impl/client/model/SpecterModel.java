@@ -1,6 +1,6 @@
 package com.cursee.specter.impl.client.model;
 
-import com.cursee.specter.impl.common.entity.AbstractRawSpecter;
+import com.cursee.specter.impl.common.entity.AbstractSpecter;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.EntityModel;
@@ -13,7 +13,7 @@ import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 import org.jetbrains.annotations.NotNull;
 
-public class RawSpecterModel extends EntityModel<AbstractRawSpecter> {
+public class SpecterModel extends EntityModel<AbstractSpecter> {
 
   private final ModelPart root;
   private final ModelPart body;
@@ -21,7 +21,7 @@ public class RawSpecterModel extends EntityModel<AbstractRawSpecter> {
 
   private boolean shouldRenderShell = false;
 
-  public RawSpecterModel(final ModelPart root) {
+  public SpecterModel(final ModelPart root) {
     this.root = root;
     this.body = root.getChild("body");
     this.shell = root.getChild("shell");
@@ -47,7 +47,7 @@ public class RawSpecterModel extends EntityModel<AbstractRawSpecter> {
   }
 
   @Override
-  public void setupAnim(@NotNull AbstractRawSpecter specter, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+  public void setupAnim(@NotNull AbstractSpecter specter, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
     if (specter.getOwner() != null && specter.distanceTo(specter.getOwner()) < 4.0f) {
       this.shouldRenderShell = true;
     } else {

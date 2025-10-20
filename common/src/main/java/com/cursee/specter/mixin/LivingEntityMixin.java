@@ -1,21 +1,16 @@
 package com.cursee.specter.mixin;
 
-import com.cursee.specter.impl.common.entity.RawSpecter;
+import com.cursee.specter.impl.common.entity.Specter;
 import com.cursee.specter.impl.common.registry.ModItems;
 import java.util.concurrent.atomic.AtomicBoolean;
-import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.EntityEvent;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -52,14 +47,14 @@ public class LivingEntityMixin {
         Level level = player.level();
 
         AtomicBoolean foundSpecterOwnedBySelf = new AtomicBoolean();
-        level.getNearbyEntities(RawSpecter.class, TargetingConditions.DEFAULT, player, player.getBoundingBox().inflate(64.0D)).forEach(rawSpecter -> {
+        level.getNearbyEntities(Specter.class, TargetingConditions.DEFAULT, player, player.getBoundingBox().inflate(64.0D)).forEach(rawSpecter -> {
           if (rawSpecter.getOwner() == player) {
             foundSpecterOwnedBySelf.set(true);
           }
         });
 
         if (!foundSpecterOwnedBySelf.get()) {
-          var specter = new RawSpecter(level, player);
+          var specter = new Specter(level, player);
           specter.moveTo(player.position());
           level.addFreshEntity(specter);
         }

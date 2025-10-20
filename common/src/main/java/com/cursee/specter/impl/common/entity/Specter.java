@@ -1,7 +1,6 @@
 package com.cursee.specter.impl.common.entity;
 
 import com.cursee.specter.impl.common.registry.ModEntities;
-import java.util.Random;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -17,14 +16,14 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
-public class RawSpecter extends AbstractRawSpecter {
+public class Specter extends AbstractSpecter {
 
-  public RawSpecter(EntityType<? extends AbstractRawSpecter> entityType, Level level) {
+  public Specter(EntityType<? extends AbstractSpecter> entityType, Level level) {
     super(entityType, level);
   }
 
-  public RawSpecter(Level level, @Nullable LivingEntity owner) {
-    this(ModEntities.RAW_SPECTER, level);
+  public Specter(Level level, @Nullable LivingEntity owner) {
+    this(ModEntities.SPECTER, level);
     this.setOwner(owner);
   }
 

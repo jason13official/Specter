@@ -4,40 +4,34 @@ import com.cursee.specter.Constants;
 import com.cursee.specter.platform.Services;
 import java.util.Optional;
 import java.util.UUID;
-import net.minecraft.commands.arguments.EntityAnchorArgument.Anchor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.TraceableEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraft.world.phys.Vec3;
-import org.apache.commons.lang3.text.translate.NumericEntityUnescaper.OPTION;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class AbstractRawSpecter extends Mob implements TraceableEntity {
+public abstract class AbstractSpecter extends Mob implements TraceableEntity {
 
   public static final String SPECTER_OWNER_TAG = "specter_owner";
-  public static final EntityDataAccessor<Optional<UUID>> OPTIONAL_OWNER_UUID = SynchedEntityData.defineId(AbstractRawSpecter.class, EntityDataSerializers.OPTIONAL_UUID);
+  public static final EntityDataAccessor<Optional<UUID>> OPTIONAL_OWNER_UUID = SynchedEntityData.defineId(AbstractSpecter.class, EntityDataSerializers.OPTIONAL_UUID);
 
   private @Nullable LivingEntity owner;
 
-  public AbstractRawSpecter(EntityType<? extends AbstractRawSpecter> entityType, Level level) {
+  public AbstractSpecter(EntityType<? extends AbstractSpecter> entityType, Level level) {
     super(entityType, level);
     this.setNoGravity(true);
   }
@@ -84,7 +78,7 @@ public abstract class AbstractRawSpecter extends Mob implements TraceableEntity 
 
   @Override
   public boolean canCollideWith(Entity entity) {
-    return entity instanceof AbstractRawSpecter;
+    return entity instanceof AbstractSpecter;
   }
 
   @Override

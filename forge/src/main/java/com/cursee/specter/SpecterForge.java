@@ -1,6 +1,6 @@
 package com.cursee.specter;
 
-import com.cursee.specter.impl.common.entity.RawSpecter;
+import com.cursee.specter.impl.common.entity.Specter;
 import com.cursee.specter.impl.common.registry.ModEntities;
 import com.cursee.specter.impl.common.registry.ModItems;
 import java.util.function.BiConsumer;
@@ -46,7 +46,7 @@ public class SpecterForge {
 
     // before integrated/dedicated server launch
     SpecterForge.eventBus.addListener((Consumer<EntityAttributeCreationEvent>) event -> {
-      event.put(ModEntities.RAW_SPECTER, RawSpecter.createAttributes().build());
+      event.put(ModEntities.SPECTER, Specter.createAttributes().build());
     });
 
     MinecraftForge.EVENT_BUS.addListener((Consumer<ServerStartingEvent>) event -> SpecterServer.onServerStarting(event.getServer()));

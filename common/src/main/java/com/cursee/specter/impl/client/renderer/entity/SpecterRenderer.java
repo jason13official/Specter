@@ -1,8 +1,8 @@
 package com.cursee.specter.impl.client.renderer.entity;
 
 import com.cursee.specter.SpecterCommon;
-import com.cursee.specter.impl.client.model.RawSpecterModel;
-import com.cursee.specter.impl.common.entity.AbstractRawSpecter;
+import com.cursee.specter.impl.client.model.SpecterModel;
+import com.cursee.specter.impl.common.entity.AbstractSpecter;
 import com.cursee.specter.impl.common.registry.ModEntities;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
@@ -18,34 +18,34 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
-public class RawSpecterRenderer extends EntityRenderer<AbstractRawSpecter> implements RenderLayerParent<AbstractRawSpecter, EntityModel<AbstractRawSpecter>> {
+public class SpecterRenderer extends EntityRenderer<AbstractSpecter> implements RenderLayerParent<AbstractSpecter, EntityModel<AbstractSpecter>> {
 
-  public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ModEntities.RAW_SPECTER_ID, "main");
-  private static final ResourceLocation TEXTURE_LOCATION = SpecterCommon.identifier("textures/entity/raw_specter.png");
-  private final RawSpecterModel model;
+  public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ModEntities.SPECTER_ID, "main");
+  private static final ResourceLocation TEXTURE_LOCATION = SpecterCommon.identifier("textures/entity/specter.png");
+  private final SpecterModel model;
 
-  public RawSpecterRenderer(EntityRendererProvider.Context context) {
+  public SpecterRenderer(EntityRendererProvider.Context context) {
     super(context);
-    this.model = new RawSpecterModel(context.bakeLayer(LAYER_LOCATION));
+    this.model = new SpecterModel(context.bakeLayer(LAYER_LOCATION));
   }
 
   @Override
-  public @NotNull RawSpecterModel getModel() {
+  public @NotNull SpecterModel getModel() {
     return this.model;
   }
 
   @Override
-  public @NotNull ResourceLocation getTextureLocation(AbstractRawSpecter specter) {
+  public @NotNull ResourceLocation getTextureLocation(AbstractSpecter specter) {
     return TEXTURE_LOCATION;
   }
 
   @Override
-  public boolean shouldRender(AbstractRawSpecter livingEntity, Frustum camera, double camX, double camY, double camZ) {
+  public boolean shouldRender(AbstractSpecter livingEntity, Frustum camera, double camX, double camY, double camZ) {
     return true;
   }
 
   @Override
-  public void render(AbstractRawSpecter specter, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
+  public void render(AbstractSpecter specter, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
 
     poseStack.pushPose();
 
