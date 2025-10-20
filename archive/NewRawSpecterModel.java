@@ -7,9 +7,11 @@ public class NewRawSpecterModel<T extends Entity> extends EntityModel<T> {
 	// This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
 	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation("modid", "newrawspectermodel"), "main");
 	private final ModelPart body;
+	private final ModelPart shell;
 
 	public NewRawSpecterModel(ModelPart root) {
 		this.body = root.getChild("body");
+		this.shell = root.getChild("shell");
 	}
 
 	public static LayerDefinition createBodyLayer() {
@@ -22,7 +24,9 @@ public class NewRawSpecterModel<T extends Entity> extends EntityModel<T> {
 
 		PartDefinition cube_r2 = body.addOrReplaceChild("cube_r2", CubeListBuilder.create().texOffs(0, 0).addBox(-2.0F, -4.0F, -2.0F, 4.0F, 4.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 0.0F, 0.0F, 0.0F, -0.7854F, 0.0F));
 
-		return LayerDefinition.create(meshdefinition, 32, 32);
+		PartDefinition shell = partdefinition.addOrReplaceChild("shell", CubeListBuilder.create().texOffs(0, 20).addBox(-4.0F, -6.0F, -4.0F, 8.0F, 8.0F, 8.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 24.0F, 0.0F));
+
+		return LayerDefinition.create(meshdefinition, 64, 64);
 	}
 
 	@Override
@@ -33,5 +37,6 @@ public class NewRawSpecterModel<T extends Entity> extends EntityModel<T> {
 	@Override
 	public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
 		body.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+		shell.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
 	}
 }
