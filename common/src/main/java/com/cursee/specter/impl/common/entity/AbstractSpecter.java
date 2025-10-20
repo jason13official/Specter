@@ -10,6 +10,8 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -18,6 +20,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.TraceableEntity;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -27,9 +30,12 @@ import org.jetbrains.annotations.Nullable;
 public abstract class AbstractSpecter extends Mob implements TraceableEntity {
 
   public static final String SPECTER_OWNER_TAG = "specter_owner";
+  public static final String SPECTER_COLOR_TAG = "specter_color";
   public static final EntityDataAccessor<Optional<UUID>> OPTIONAL_OWNER_UUID = SynchedEntityData.defineId(AbstractSpecter.class, EntityDataSerializers.OPTIONAL_UUID);
+  public static final EntityDataAccessor<Integer> DYE_COLOR_ID = SynchedEntityData.defineId(AbstractSpecter.class, EntityDataSerializers.INT);
 
   private @Nullable LivingEntity owner;
+  private DyeColor dyeColor = DyeColor.WHITE;
 
   public AbstractSpecter(EntityType<? extends AbstractSpecter> entityType, Level level) {
     super(entityType, level);
@@ -40,6 +46,7 @@ public abstract class AbstractSpecter extends Mob implements TraceableEntity {
   protected void defineSynchedData() {
     super.defineSynchedData();
     this.getEntityData().define(OPTIONAL_OWNER_UUID, Optional.empty());
+    this.getEntityData().define(DYE_COLOR_ID, DyeColor.WHITE.getId());
   }
 
   public @NotNull Optional<UUID> getOwnerId() {
@@ -50,20 +57,36 @@ public abstract class AbstractSpecter extends Mob implements TraceableEntity {
     this.entityData.set(OPTIONAL_OWNER_UUID, Optional.of(uuid));
   }
 
+  public DyeColor getDyeColor() {
+    return DyeColor.byId(this.getEntityData().get(DYE_COLOR_ID));
+  }
+
+  public void setDyeColor(DyeColor dyeColor) {
+    this.entityData.set(DYE_COLOR_ID, dyeColor.getId());
+  }
+
   @Override
   public void readAdditionalSaveData(@NotNull CompoundTag compoundTag) {
     super.readAdditionalSaveData(compoundTag);
+
     if (compoundTag.contains(SPECTER_OWNER_TAG, Tag.TAG_INT_ARRAY) && compoundTag.getIntArray(SPECTER_OWNER_TAG).length == 4) {
       this.setOwnerId(compoundTag.getUUID(SPECTER_OWNER_TAG));
+    }
+
+    if (compoundTag.contains(SPECTER_COLOR_TAG, Tag.TAG_INT)) {
+      this.setDyeColor(DyeColor.byId(compoundTag.getInt(SPECTER_COLOR_TAG) % 16));
     }
   }
 
   @Override
   public void addAdditionalSaveData(@NotNull CompoundTag compoundTag) {
     super.addAdditionalSaveData(compoundTag);
+
     this.getOwnerId().ifPresent(uuid -> {
       compoundTag.putUUID(SPECTER_OWNER_TAG, uuid);
     });
+
+    compoundTag.putInt(SPECTER_COLOR_TAG, this.getDyeColor().getId());
   }
 
   @Override
@@ -94,6 +117,22 @@ public abstract class AbstractSpecter extends Mob implements TraceableEntity {
   }
 
   public void scanForEntities() {
+
+
+    // fix server desync
+    // if the owner is not null, but the player is not the same, map to actual player
+    // owned by  a player, but underlying LivingEntity owner is not the same object
+    if (this.owner != null && this.getOwnerId().isPresent() && this.level() instanceof ServerLevel serverLevel) {
+
+      UUID ownerId = this.getOwnerId().get();
+
+      for (Entity entity : serverLevel.getAllEntities()) {
+        if (entity instanceof ServerPlayer serverPlayer && ownerId.equals(serverPlayer.getUUID())) {
+          this.setOwner(serverPlayer);
+        }
+      }
+    }
+
     // if (this.owner == null || this.owner.distanceToSqr(this) > (double)4.0f) {
     if (this.owner == null) {
 
@@ -108,7 +147,7 @@ public abstract class AbstractSpecter extends Mob implements TraceableEntity {
       this.getOwnerId().ifPresent(uuid -> {
 
         if (Services.PLATFORM.isDevelopmentEnvironment() && this.level().isClientSide()) {
-          Constants.LOG.info("Owner UUID present on client, still searching...");
+          Constants.LOG.info("Owner UUID {} present on client, still searching...", uuid.toString());
         }
 
         this.level().players().forEach(player -> {

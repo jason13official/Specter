@@ -1,5 +1,6 @@
 package com.cursee.specter;
 
+import com.cursee.specter.platform.Services;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -14,6 +15,9 @@ public class SpecterServer {
   }
 
   public static void onEntityJoinServerLevel(Entity abstractEntity, ServerLevel serverLevel) {
+    if (Services.PLATFORM.isDevelopmentEnvironment() && abstractEntity instanceof ServerPlayer serverPlayer) {
+      Constants.LOG.info("ServerPlayer joined world with name and UUID {} {} ", serverPlayer.getName().getString(), serverPlayer.getStringUUID());
+    }
   }
 
   public static void onServerStopping(final MinecraftServer server) {
