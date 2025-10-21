@@ -34,17 +34,15 @@ public class EntityPersistentDataMixin implements PersistentDataHolder {
 
   @Inject(at = @At("TAIL"), method = "load")
   private void specter$readAdditionalSaveData(CompoundTag compound, CallbackInfo ci) {
-    LivingEntity self = (LivingEntity) (Object) this;
-    if (this.specter$persistentData != null) {
-      self.readAdditionalSaveData(this.specter$persistentData);
+    if (compound.contains("specter.persistent_data")) {
+      this.specter$persistentData= compound.getCompound("specter.persistent_data");
     }
   }
 
   @Inject(at = @At("TAIL"), method = "saveWithoutId")
   private void specter$addAdditionalSaveData(CompoundTag compound, CallbackInfoReturnable<CompoundTag> cir) {
-    LivingEntity self = (LivingEntity) (Object) this;
     if (this.specter$persistentData != null) {
-      self.addAdditionalSaveData(this.specter$persistentData);
+      compound.put("specter.persistent_data", this.specter$persistentData);
     }
   }
 }
