@@ -37,7 +37,7 @@ public class SpecterSummonerItem extends SpecterCoreItem {
     if (!foundSpecterOwnedBySelf.get()) {
       if (!player.level().isClientSide()) {
 
-        DyeColor spawnColor = DyeColor.byId(player.getRandom().nextInt(0, 15));
+        DyeColor spawnColor = this.dyeColor; // DyeColor.byId(player.getRandom().nextInt(0, 15));
 
         var specter = new Specter(player.level(), player, spawnColor);
         specter.moveTo(player.position());

@@ -24,7 +24,7 @@ public class FabricLootModifiers {
 
         LootPool.Builder poolBuilder = LootPool.lootPool()
             .setRolls(ConstantValue.exactly(1.0f))
-            .conditionally(LootItemRandomChanceCondition.randomChance(0.25f).build())
+            .conditionally(LootItemRandomChanceCondition.randomChance(0.01f).build())
             .with(LootItem.lootTableItem(ModItems.SPECTER_CORE).build())
             .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0f, 1.0f)));
 

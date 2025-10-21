@@ -2,5 +2,21 @@
   "itemGroup.specter": "Specter",
   "entity.specter.specter": "Specter",
   "item.specter.specter_core": "Specter Core",
-  "item.specter.specter_summoner": "Specter Summoner"
+
+  "item.specter.specter_summoner_white": "Specter Summoner White",
+  "item.specter.specter_summoner_orange": "Specter Summoner Orange",
+  "item.specter.specter_summoner_magenta": "Specter Summoner Magenta",
+  "item.specter.specter_summoner_light_blue": "Specter Summoner Light_blue",
+  "item.specter.specter_summoner_yellow": "Specter Summoner Yellow",
+  "item.specter.specter_summoner_lime": "Specter Summoner Lime",
+  "item.specter.specter_summoner_pink": "Specter Summoner Pink",
+  "item.specter.specter_summoner_gray": "Specter Summoner Gray",
+  "item.specter.specter_summoner_light_gray": "Specter Summoner Light_gray",
+  "item.specter.specter_summoner_cyan": "Specter Summoner Cyan",
+  "item.specter.specter_summoner_purple": "Specter Summoner Purple",
+  "item.specter.specter_summoner_blue": "Specter Summoner Blue",
+  "item.specter.specter_summoner_brown": "Specter Summoner Brown",
+  "item.specter.specter_summoner_green": "Specter Summoner Green",
+  "item.specter.specter_summoner_red": "Specter Summoner Red",
+  "item.specter.specter_summoner_black": "Specter Summoner Black"
 }
