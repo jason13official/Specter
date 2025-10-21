@@ -43,6 +43,11 @@ public abstract class AbstractSpecter extends Mob implements TraceableEntity {
   }
 
   @Override
+  public boolean shouldShowName() {
+    return this.hasCustomName();
+  }
+
+  @Override
   protected void defineSynchedData() {
     super.defineSynchedData();
     this.getEntityData().define(OPTIONAL_OWNER_UUID, Optional.empty());

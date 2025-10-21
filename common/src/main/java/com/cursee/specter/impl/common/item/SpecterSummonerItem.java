@@ -2,6 +2,7 @@ package com.cursee.specter.impl.common.item;
 
 import com.cursee.specter.impl.common.entity.Specter;
 import java.util.concurrent.atomic.AtomicBoolean;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -40,6 +41,11 @@ public class SpecterSummonerItem extends SpecterCoreItem {
         DyeColor spawnColor = this.dyeColor; // DyeColor.byId(player.getRandom().nextInt(0, 15));
 
         var specter = new Specter(player.level(), player, spawnColor);
+
+        if (player.getItemInHand(usedHand).hasCustomHoverName()) {
+          specter.setCustomName(player.getItemInHand(usedHand).getHoverName());
+        }
+
         specter.moveTo(player.position());
         player.level().addFreshEntity(specter);
       }
