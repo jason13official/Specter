@@ -1,6 +1,7 @@
 package com.cursee.specter.impl.common.entity;
 
 import com.cursee.specter.impl.common.registry.ModEntities;
+import com.cursee.specter.impl.common.registry.ModItems;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -15,6 +16,8 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -50,7 +53,47 @@ public class Specter extends AbstractSpecter {
 //      this.level().addFreshEntity(specter);
 //    }
 
+    if (hand == InteractionHand.MAIN_HAND && player.getItemInHand(hand).isEmpty() && player.isShiftKeyDown()) {
+
+      Item item = getSpecterSummonerItem();
+
+      ItemStack stack = new ItemStack(item);
+
+      if (this.hasCustomName()) {
+        stack.setHoverName(this.getCustomName());
+      }
+
+      player.setItemInHand(hand, stack);
+
+      this.discard();
+    }
+
     return super.mobInteract(player, hand);
+  }
+
+  private Item getSpecterSummonerItem() {
+    Item item;
+
+    switch (this.getDyeColor()) {
+      case WHITE -> item = ModItems.SPECTER_SUMMONER_WHITE;
+      case ORANGE -> item = ModItems.SPECTER_SUMMONER_ORANGE;
+      case MAGENTA -> item = ModItems.SPECTER_SUMMONER_MAGENTA;
+      case LIGHT_BLUE -> item = ModItems.SPECTER_SUMMONER_LIGHT_BLUE;
+      case YELLOW -> item = ModItems.SPECTER_SUMMONER_YELLOW;
+      case LIME -> item = ModItems.SPECTER_SUMMONER_LIME;
+      case PINK -> item = ModItems.SPECTER_SUMMONER_PINK;
+      case GRAY -> item = ModItems.SPECTER_SUMMONER_GRAY;
+      case LIGHT_GRAY -> item = ModItems.SPECTER_SUMMONER_LIGHT_GRAY;
+      case CYAN -> item = ModItems.SPECTER_SUMMONER_CYAN;
+      case PURPLE -> item = ModItems.SPECTER_SUMMONER_PURPLE;
+      case BLUE -> item = ModItems.SPECTER_SUMMONER_BLUE;
+      case BROWN -> item = ModItems.SPECTER_SUMMONER_BROWN;
+      case GREEN -> item = ModItems.SPECTER_SUMMONER_GREEN;
+      case RED -> item = ModItems.SPECTER_SUMMONER_RED;
+      case BLACK -> item = ModItems.SPECTER_SUMMONER_BLACK;
+      default -> item = ModItems.SPECTER_CORE;
+    }
+    return item;
   }
 
   @Override
