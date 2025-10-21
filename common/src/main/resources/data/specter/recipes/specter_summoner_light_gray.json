@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "#": {
+      "item": "minecraft:copper_ingot"
+    },
+    "X": {
+      "item": "specter:specter_core"
+    },
+    "D": {
+      "tag": "specter:light_gray_dyes"
+    }
+  },
+  "pattern": [
+    "D#D",
+    "#X#",
+    "D#D"
+  ],
+  "result": {
+    "item": "specter:specter_summoner_light_gray"
+  },
+  "show_notification": true
+}

@@ -9,7 +9,7 @@
       "item": "specter:specter_core"
     },
     "D": {
-      "tag": "specter:dyes"
+      "tag": "specter:magenta_dyes"
     }
   },
   "pattern": [
@@ -18,7 +18,7 @@
     "D#D"
   ],
   "result": {
-    "item": "specter:specter_summoner"
+    "item": "specter:specter_summoner_magenta"
   },
   "show_notification": true
 }

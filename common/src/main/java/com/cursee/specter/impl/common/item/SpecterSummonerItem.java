@@ -17,8 +17,11 @@ import net.minecraft.world.level.Level;
 
 public class SpecterSummonerItem extends SpecterCoreItem {
 
-  public SpecterSummonerItem(Properties properties) {
+  private DyeColor dyeColor = DyeColor.WHITE;
+
+  public SpecterSummonerItem(Properties properties, DyeColor dyeColor) {
     super(properties.rarity(Rarity.EPIC));
+    this.dyeColor = dyeColor;
   }
 
   @Override

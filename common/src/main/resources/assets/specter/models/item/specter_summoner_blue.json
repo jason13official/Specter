@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/handheld",
   "textures": {
-    "layer0": "specter:item/throttled_allay_totem"
+    "layer0": "specter:item/specter_core"
   }
 }
