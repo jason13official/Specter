@@ -13,6 +13,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -22,6 +23,29 @@ public class LivingEntityMixin {
 
   @Inject(at = @At("HEAD"), method = "checkTotemDeathProtection", cancellable = true)
   private void specter$checkTotemDeathProtection(DamageSource damageSource, CallbackInfoReturnable<Boolean> cir) {
+
+    LivingEntity self = (LivingEntity) (Object) this;
+
+    if (self instanceof Player player) {
+
+      Level level = player.level();
+
+      AtomicBoolean hasOwnedSpecterNearby = new AtomicBoolean();
+      level.getNearbyEntities(Specter.class, TargetingConditions.DEFAULT, player, player.getBoundingBox().inflate(64.0D)).forEach(rawSpecter -> {
+        if (rawSpecter.getOwner() == player) {
+          hasOwnedSpecterNearby.set(true);
+        }
+      });
+
+      if (hasOwnedSpecterNearby.get()) {
+        self.setHealth(2.0F);
+        cir.setReturnValue(true);
+      }
+    }
+  }
+
+  @Unique @Deprecated
+  private void specter$checkTotemDeathProtectionOLD(DamageSource damageSource, CallbackInfoReturnable<Boolean> cir) {
 
     LivingEntity self = (LivingEntity) (Object) this;
 
