@@ -1,5 +1,6 @@
 package com.cursee.specter.impl.common.entity;
 
+import com.cursee.specter.api.common.util.SpecterHelper;
 import com.cursee.specter.impl.common.registry.ModEntities;
 import com.cursee.specter.impl.common.registry.ModItems;
 import net.minecraft.core.particles.ParticleTypes;
@@ -10,7 +11,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -28,12 +28,12 @@ public class Specter extends AbstractSpecter {
     super(entityType, level);
   }
 
-  public Specter(Level level, @Nullable LivingEntity owner) {
+  public Specter(Level level, @Nullable Player owner) {
     this(ModEntities.SPECTER, level);
     this.setOwner(owner);
   }
 
-  public Specter(Level level, @Nullable LivingEntity owner, DyeColor dyeColor) {
+  public Specter(Level level, @Nullable Player owner, DyeColor dyeColor) {
     this(level, owner);
     this.setDyeColor(dyeColor);
   }
@@ -45,15 +45,7 @@ public class Specter extends AbstractSpecter {
   @Override
   protected InteractionResult mobInteract(Player player, InteractionHand hand) {
 
-//    // if player interacting with unowned specter
-//    // create new raw specter owned by the player and move to player location
-//    if (!this.level().isClientSide() && hand == InteractionHand.MAIN_HAND && this.getOwner() == null) {
-//      var specter = new RawSpecter(this.level(), player);
-//      specter.moveTo(player.position());
-//      this.level().addFreshEntity(specter);
-//    }
-
-    if (hand == InteractionHand.MAIN_HAND && player.getItemInHand(hand).isEmpty() && player.isShiftKeyDown()) {
+    if (this.getOwner() == player && hand == InteractionHand.MAIN_HAND && player.getItemInHand(hand).isEmpty() && player.isShiftKeyDown()) {
 
       Item item = getSpecterSummonerItem();
 
@@ -102,21 +94,16 @@ public class Specter extends AbstractSpecter {
 
     // new logic
 
-    LivingEntity owner = this.getOwner();
-    if (owner instanceof Player player) {
-
-      // oncer per second
-      if (this.tickCount % 20 == 0) {
-
-        // heal and apply effect if close to player
-        if (this.distanceTo(player) < 4.0f) {
-          this.healOwner(player);
-        }
+    if (this.tickCount % 20 == 0) {
+      if (SpecterHelper.hasOwnedSpecterNearby(this, this.getOwner(), true)) {
+        this.healOwner();
       }
     }
   }
 
-  private void healOwner(Player player) {
+  private void healOwner() {
+
+    Player player = this.getOwner();
 
     if (player.getHealth() < (player.getMaxHealth() * 0.95f)) {
 

@@ -1,10 +1,10 @@
 package com.cursee.specter.api.common.accessor;
 
-import com.cursee.specter.mixin.ServerPlayerPersistentDataMixin;
+import com.cursee.specter.mixin.EntityPersistentDataMixin;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 
-/// Automatically implemented on {@link ServerPlayer} by {@link ServerPlayerPersistentDataMixin}
+/// Automatically implemented on {@link Entity} by {@link EntityPersistentDataMixin}
 public interface PersistentDataHolder {
 
   CompoundTag specter$getPersistentData();

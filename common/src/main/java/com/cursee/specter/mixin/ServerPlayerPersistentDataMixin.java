@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+/// Retrieves old persistent data for reconstructing a player after death/dying.
 @Mixin(ServerPlayer.class)
 public class ServerPlayerPersistentDataMixin {
 
@@ -18,7 +19,6 @@ public class ServerPlayerPersistentDataMixin {
 
     PersistentDataHolder holder = (PersistentDataHolder) self;
     CompoundTag oldPlayerData = holder.specter$getPersistentData();
-
     holder.specter$setPersistentData(oldPlayerData);
   }
 }

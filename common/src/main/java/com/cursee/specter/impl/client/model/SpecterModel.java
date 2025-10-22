@@ -1,5 +1,6 @@
 package com.cursee.specter.impl.client.model;
 
+import com.cursee.specter.api.common.util.SpecterHelper;
 import com.cursee.specter.impl.common.entity.AbstractSpecter;
 import com.cursee.specter.impl.common.entity.Specter;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -49,7 +50,8 @@ public class SpecterModel extends EntityModel<Specter> {
 
   @Override
   public void setupAnim(@NotNull Specter specter, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-    if (specter.getOwner() != null && specter.distanceTo(specter.getOwner()) < 4.0f) {
+    // if (specter.getOwner() != null && specter.distanceTo(specter.getOwner()) < 4.0f) {
+    if (SpecterHelper.hasOwnedSpecterNearby(specter, specter.getOwner(), true)) {
       this.shouldRenderShell = true;
     } else {
       this.shouldRenderShell = false;

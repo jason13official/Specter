@@ -20,6 +20,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.TraceableEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -34,7 +35,7 @@ public abstract class AbstractSpecter extends Mob implements TraceableEntity {
   public static final EntityDataAccessor<Optional<UUID>> OPTIONAL_OWNER_UUID = SynchedEntityData.defineId(AbstractSpecter.class, EntityDataSerializers.OPTIONAL_UUID);
   public static final EntityDataAccessor<Integer> DYE_COLOR_ID = SynchedEntityData.defineId(AbstractSpecter.class, EntityDataSerializers.INT);
 
-  private @Nullable LivingEntity owner;
+  private @Nullable Player owner;
   private DyeColor dyeColor = DyeColor.WHITE;
 
   public AbstractSpecter(EntityType<? extends AbstractSpecter> entityType, Level level) {
@@ -110,11 +111,11 @@ public abstract class AbstractSpecter extends Mob implements TraceableEntity {
   }
 
   @Override
-  public @Nullable LivingEntity getOwner() {
+  public @Nullable Player getOwner() {
     return this.owner;
   }
 
-  public void setOwner(@Nullable LivingEntity newOwner) {
+  public void setOwner(@Nullable Player newOwner) {
     if (newOwner != null && !newOwner.isDeadOrDying()) {
       this.owner = newOwner;
       this.setOwnerId(newOwner.getUUID());
