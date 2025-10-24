@@ -1,19 +1,13 @@
 package com.cursee.specter;
 
-import com.cursee.specter.impl.common.entity.Specter;
-import com.cursee.specter.impl.common.registry.ModEntities;
-import com.cursee.specter.impl.common.registry.ModItems;
-import com.cursee.specter.impl.forge.common.loot.ForgeLootModifiers;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import net.minecraft.core.Registry;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
@@ -36,8 +30,6 @@ public class SpecterForge {
     SpecterForge.eventBus = context.getModEventBus();
 
     // bind before common init
-    bind(Registries.ITEM, ModItems::register);
-    bind(Registries.ENTITY_TYPE, ModEntities::register);
 
     SpecterCommon.init();
 
@@ -45,10 +37,7 @@ public class SpecterForge {
       new SpecterClientForge();
     }
 
-    // before integrated/dedicated server launch
-    SpecterForge.eventBus.addListener((Consumer<EntityAttributeCreationEvent>) event -> {
-      event.put(ModEntities.SPECTER, Specter.createAttributes().build());
-    });
+    // before integrated/dedicated server launch (attributes)
 
     MinecraftForge.EVENT_BUS.addListener((Consumer<ServerStartingEvent>) event -> SpecterServer.onServerStarting(event.getServer()));
     MinecraftForge.EVENT_BUS.addListener((Consumer<ServerStartedEvent>) event -> SpecterServer.onServerStarted(event.getServer()));
@@ -64,7 +53,6 @@ public class SpecterForge {
     MinecraftForge.EVENT_BUS.addListener((Consumer<ServerStoppedEvent>) event -> SpecterServer.onServerStopped(event.getServer()));
 
     // loader specifics
-    ForgeLootModifiers.register(SpecterForge.eventBus);
   }
 
   @Deprecated(forRemoval = true, since = "1.21.1")

@@ -15,9 +15,6 @@ public class SpecterServer {
   }
 
   public static void onEntityJoinServerLevel(Entity abstractEntity, ServerLevel serverLevel) {
-    if (Services.PLATFORM.isDevelopmentEnvironment() && abstractEntity instanceof ServerPlayer serverPlayer) {
-      Constants.LOG.info("ServerPlayer joined world with name and UUID {} {} ", serverPlayer.getName().getString(), serverPlayer.getStringUUID());
-    }
   }
 
   public static void onServerStopping(final MinecraftServer server) {
