@@ -1,8 +1,6 @@
 package com.cursee.specter.platform;
 
 import com.cursee.specter.platform.services.IPlatformHelper;
-import java.io.File;
-import java.net.URI;
 import java.nio.file.Path;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLLoader;
