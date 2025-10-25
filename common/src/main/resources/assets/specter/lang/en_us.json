@@ -1,4 +1,6 @@
 {
   "item.specter.specter_core": "Specter Core",
-  "item.specter.condensed_specter": "Condensed Specter"
+  "item.specter.condensed_specter": "Condensed Specter",
+
+  "entity.specter.specter": "Specter"
 }
