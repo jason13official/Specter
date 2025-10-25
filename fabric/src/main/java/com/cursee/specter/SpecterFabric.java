@@ -1,6 +1,7 @@
 package com.cursee.specter;
 
 import com.cursee.specter.impl.common.registry.ModItems;
+import com.cursee.specter.impl.fabric.common.loot.FabricLootModifiers;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import net.fabricmc.api.ModInitializer;
@@ -36,5 +37,6 @@ public class SpecterFabric implements ModInitializer {
     ServerLifecycleEvents.SERVER_STOPPED.register(SpecterServer::onServerStopped);
 
     // loader specific
+    FabricLootModifiers.register();
   }
 }
