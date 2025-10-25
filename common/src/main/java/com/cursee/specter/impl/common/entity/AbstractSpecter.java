@@ -4,55 +4,57 @@ import com.cursee.specter.Constants;
 import com.cursee.specter.platform.Services;
 import java.util.Optional;
 import java.util.UUID;
-import net.minecraft.core.BlockPos;
+import java.util.concurrent.atomic.AtomicReference;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.Entity;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.TraceableEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class AbstractSpecter extends Mob implements TraceableEntity {
+public abstract class AbstractSpecter extends AbstractBoringEntity implements TraceableEntity {
 
   public static final String SPECTER_OWNER_TAG = "specter_owner";
   public static final String SPECTER_COLOR_TAG = "specter_color";
   public static final EntityDataAccessor<Optional<UUID>> OPTIONAL_OWNER_UUID = SynchedEntityData.defineId(AbstractSpecter.class, EntityDataSerializers.OPTIONAL_UUID);
-  public static final EntityDataAccessor<Integer> DYE_COLOR_ID = SynchedEntityData.defineId(AbstractSpecter.class, EntityDataSerializers.INT);
+  public static final EntityDataAccessor<Integer> SPECTER_COLOR = SynchedEntityData.defineId(AbstractSpecter.class, EntityDataSerializers.INT);
 
-  private @Nullable Player owner;
-  private DyeColor dyeColor = DyeColor.WHITE;
+  private @Nullable LivingEntity owner;
 
-  public AbstractSpecter(EntityType<? extends AbstractSpecter> entityType, Level level) {
+  protected AbstractSpecter(EntityType<? extends AbstractSpecter> entityType, Level level) {
     super(entityType, level);
     this.setNoGravity(true);
   }
 
   @Override
-  public boolean shouldShowName() {
-    return this.hasCustomName();
+  public @Nullable LivingEntity getOwner() {
+    return owner;
+  }
+
+  public void setOwner(@Nullable LivingEntity newOwner) {
+    if (newOwner != null && !newOwner.isDeadOrDying()) {
+      this.owner = newOwner;
+      this.setOwnerId(newOwner.getUUID());
+    }
   }
 
   @Override
   protected void defineSynchedData() {
     super.defineSynchedData();
     this.getEntityData().define(OPTIONAL_OWNER_UUID, Optional.empty());
-    this.getEntityData().define(DYE_COLOR_ID, DyeColor.WHITE.getId());
+    this.getEntityData().define(SPECTER_COLOR, DyeColor.WHITE.getId());
   }
 
   public @NotNull Optional<UUID> getOwnerId() {
@@ -63,12 +65,23 @@ public abstract class AbstractSpecter extends Mob implements TraceableEntity {
     this.entityData.set(OPTIONAL_OWNER_UUID, Optional.of(uuid));
   }
 
-  public DyeColor getDyeColor() {
-    return DyeColor.byId(this.getEntityData().get(DYE_COLOR_ID));
+  public int getSpecterColor() {
+    return this.getEntityData().get(SPECTER_COLOR);
   }
 
-  public void setDyeColor(DyeColor dyeColor) {
-    this.entityData.set(DYE_COLOR_ID, dyeColor.getId());
+  public float[] getDiffuseSpecterColors() {
+
+    int textureDefuseColor = this.getSpecterColor();
+
+    int i = (textureDefuseColor & 16711680) >> 16;
+    int j = (textureDefuseColor & '\uff00') >> 8;
+    int k = (textureDefuseColor & 255) >> 0;
+
+    return new float[]{(float)i / 255.0F, (float)j / 255.0F, (float)k / 255.0F};
+  }
+
+  public void setSpecterColor(int color) {
+    this.entityData.set(SPECTER_COLOR, color);
   }
 
   @Override
@@ -80,7 +93,7 @@ public abstract class AbstractSpecter extends Mob implements TraceableEntity {
     }
 
     if (compoundTag.contains(SPECTER_COLOR_TAG, Tag.TAG_INT)) {
-      this.setDyeColor(DyeColor.byId(compoundTag.getInt(SPECTER_COLOR_TAG) % 16));
+      this.setSpecterColor(compoundTag.getInt(SPECTER_COLOR_TAG));
     }
   }
 
@@ -92,136 +105,63 @@ public abstract class AbstractSpecter extends Mob implements TraceableEntity {
       compoundTag.putUUID(SPECTER_OWNER_TAG, uuid);
     });
 
-    compoundTag.putInt(SPECTER_COLOR_TAG, this.getDyeColor().getId());
+    compoundTag.putInt(SPECTER_COLOR_TAG, this.getSpecterColor());
   }
 
-  @Override
-  public boolean isPickable() {
-    return true;
-  }
+  public void attemptResynchronization() {
 
-  @Override
-  public boolean canBeCollidedWith() {
-    return false;
-  }
-
-  @Override
-  public boolean canCollideWith(Entity entity) {
-    return entity instanceof AbstractSpecter;
-  }
-
-  @Override
-  public @Nullable Player getOwner() {
-    return this.owner;
-  }
-
-  public void setOwner(@Nullable Player newOwner) {
-    if (newOwner != null && !newOwner.isDeadOrDying()) {
-      this.owner = newOwner;
-      this.setOwnerId(newOwner.getUUID());
+    // fix possible desync after player respawns
+    boolean ownerIdPresent = this.getOwnerId().isPresent();
+    boolean ownerIsPlayer = this.owner instanceof Player;
+    if (ownerIdPresent && ownerIsPlayer && this.level() instanceof ServerLevel serverLevel && this.owner != serverLevel.getPlayerByUUID(this.getOwnerId().get())) {
+      if (Services.PLATFORM.isDevelopmentEnvironment()) Constants.LOG.info("Owner is instance of a player, but owner is not using correct object.");
+      this.setOwner(serverLevel.getPlayerByUUID(this.getOwnerId().get()));
     }
-  }
 
-  public void scanForEntities() {
-
-
-    // fix server desync
-    // if the owner is not null, but the player is not the same, map to actual player
-    // owned by  a player, but underlying LivingEntity owner is not the same object
-    if (this.owner != null && this.getOwnerId().isPresent() && this.level() instanceof ServerLevel serverLevel) {
+    // find owner by synced UUID
+    if (this.getOwnerId().isPresent() && this.getOwner() == null) {
+      if (Services.PLATFORM.isDevelopmentEnvironment()) {
+        Constants.LOG.info("Owner ID was present, but actual owner object was null. Client side? {}", this.level().isClientSide());
+      }
 
       UUID ownerId = this.getOwnerId().get();
-
-      for (Entity entity : serverLevel.getAllEntities()) {
-        if (entity instanceof ServerPlayer serverPlayer && ownerId.equals(serverPlayer.getUUID())) {
-          this.setOwner(serverPlayer);
+      Player playerByOwnerId = this.level().getPlayerByUUID(ownerId);
+      if (playerByOwnerId != null) {
+        if (Services.PLATFORM.isDevelopmentEnvironment()) {
+          Constants.LOG.info("Discovered player owner by UUID, setting as owner.");
         }
-      }
-    }
-
-    // if (this.owner == null || this.owner.distanceToSqr(this) > (double)4.0f) {
-    if (this.owner == null) {
-
-      if (Services.PLATFORM.isDevelopmentEnvironment() && this.level().isClientSide()) {
-        Constants.LOG.info("Missing owner on client, searching...");
+        this.setOwner(playerByOwnerId);
       }
 
-      // ExperienceOrb sets followingPlayer to the nearest available player
-      // this.owner = this.level().getNearestPlayer(this, (double)8.0F);
+      var entities = this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(64, 8, 64));
 
-      // we are checking against every alive player's UUID
-      this.getOwnerId().ifPresent(uuid -> {
+      for (int i = 0; i < entities.size(); i++) {
+        LivingEntity living = entities.get(i);
 
-        if (Services.PLATFORM.isDevelopmentEnvironment() && this.level().isClientSide()) {
-          Constants.LOG.info("Owner UUID {} present on client, still searching...", uuid.toString());
-        }
-
-        this.level().players().forEach(player -> {
-
-          UUID playerId = player.getUUID();
-
-          if (uuid.equals(playerId) && !(player.isSpectator() || player.isDeadOrDying())) {
-
-            if (Services.PLATFORM.isDevelopmentEnvironment() && this.level().isClientSide()) {
-              Constants.LOG.info("Found player with UUID matching synced owner's UUID, {}", uuid);
-              Constants.LOG.info("Setting owner on client.");
-            }
-
-            this.setOwner(player);
+        if (living.getUUID().equals(ownerId)) {
+          if (Services.PLATFORM.isDevelopmentEnvironment()) {
+            Constants.LOG.info("Discovered living owner by UUID, setting as owner.");
           }
-        });
-      });
+          this.setOwner(living);
+        }
+      }
     }
   }
 
-  @Override
-  public boolean shouldRender(double x, double y, double z) {
-    return true;
-  }
-
-  @Override
-  public boolean shouldRenderAtSqrDistance(double distance) {
-    return true;
-  }
-
-  @Override
-  public boolean causeFallDamage(float fallDistance, float multiplier, DamageSource source) {
-    return false;
-  }
-
-  @Override
-  protected int calculateFallDamage(float fallDistance, float damageMultiplier) {
-    return 0;
-  }
-
-  @Override
-  protected void checkFallDamage(double y, boolean onGround, BlockState state, BlockPos pos) {
-    // no-op
-  }
-
-  private void handleLookingAtPlayer() {
+  private void handleLookingAtOwner() {
 
     float maxRotDegrees = 8.0f;
 
     if (this.getOwner() != null) {
 
-      Vec3 targetPositionDelta = new Vec3(this.getOwner().getX() - this.getX(), this.getOwner().getY() + (double)this.getOwner().getEyeHeight() + 0.25f - this.getY(), this.getOwner().getZ() - this.getZ());
+      Vec3 targetPositionDelta = new Vec3(this.getOwner().getX() - this.getX(), this.getOwner().getY() + (double) this.getOwner().getEyeHeight() + 0.25f - this.getY(),
+          this.getOwner().getZ() - this.getZ());
 
       double targetPosDeltaSquared = targetPositionDelta.lengthSqr();
 
-      // if player farther than 4 blocks (2*2 = 4), increase max rotation degrees, otherwise lower
-      if (targetPosDeltaSquared > (double)16.0f) {
-
-        // player farther than 4 blocks
-
+      if (targetPosDeltaSquared > (double) 16.0f) {
         maxRotDegrees = 16.0f;
       }
-//      else if (targetPosDeltaSquared < (double)8.0f) {
-//
-//        // player closer than ~3 blocks
-//
-//        maxRotDegrees = 1.5f;
-//      }
 
       this.lookAt(this.getOwner(), maxRotDegrees, maxRotDegrees);
     }
@@ -236,26 +176,18 @@ public abstract class AbstractSpecter extends Mob implements TraceableEntity {
     this.yo = this.getY();
     this.zo = this.getZ();
 
-    this.handleLookingAtPlayer();
-
-    // this was for a raw entity, but LivingEntity handles gravity now, as we extend from Mob
-//    // apply water movement dampening or gravity if not in water
-//    if (this.isEyeInFluid(FluidTags.WATER)) {
-//      this.setUnderwaterMovement();
-//    } else if (!this.isNoGravity()) {
-//      this.setDeltaMovement(this.getDeltaMovement().add((double)0.0F, -0.03, (double)0.0F));
-//    }
+    this.handleLookingAtOwner();
 
     if (this.level().getFluidState(this.blockPosition()).is(FluidTags.LAVA)) {
-      this.setDeltaMovement((double)((this.random.nextFloat() - this.random.nextFloat()) * 0.2F), (double)0.2F, (double)((this.random.nextFloat() - this.random.nextFloat()) * 0.2F));
+      this.setDeltaMovement((this.random.nextFloat() - this.random.nextFloat()) * 0.2F, 0.2F, (this.random.nextFloat() - this.random.nextFloat()) * 0.2F);
     }
 
     if (!this.level().noCollision(this.getBoundingBox())) {
-      this.moveTowardsClosestSpace(this.getX(), (this.getBoundingBox().minY + this.getBoundingBox().maxY) / (double)2.0F, this.getZ());
+      this.moveTowardsClosestSpace(this.getX(), (this.getBoundingBox().minY + this.getBoundingBox().maxY) / (double) 2.0F, this.getZ());
     }
 
     if (this.tickCount % 20 == 1) {
-      this.scanForEntities();
+      this.attemptResynchronization();
     }
 
     if (this.getOwner() != null && (this.getOwner().isSpectator() || this.getOwner().isDeadOrDying())) {
@@ -263,14 +195,9 @@ public abstract class AbstractSpecter extends Mob implements TraceableEntity {
     }
 
     if (this.getOwner() != null) {
-
-      // vector pointing from this entity toward its owner's position
-
-      // experience points target center-mass of the player
-      // Vec3 targetPositionDelta = new Vec3(this.getOwner().getX() - this.getX(), this.getOwner().getY() + (double)this.getOwner().getEyeHeight() / (double)2.0F - this.getY(), this.getOwner().getZ() - this.getZ());
-
       // we are targeting slightly above the player's eye height
-      Vec3 targetPositionDelta = new Vec3(this.getOwner().getX() - this.getX(), this.getOwner().getY() + (double)this.getOwner().getEyeHeight() + 0.25f - this.getY(), this.getOwner().getZ() - this.getZ());
+      Vec3 targetPositionDelta = new Vec3(this.getOwner().getX() - this.getX(), this.getOwner().getY() + (double) this.getOwner().getEyeHeight() + 0.25f - this.getY(),
+          this.getOwner().getZ() - this.getZ());
 
       double targetPosDeltaSquared = targetPositionDelta.lengthSqr();
 
@@ -281,28 +208,20 @@ public abstract class AbstractSpecter extends Mob implements TraceableEntity {
         movementDampening = 0.5f;
       }
 
-      // if player within 16 blocks (16*16 = 256)
-      // if (targetPosDeltaSquared < (double)256.0F) {
-
       // if the player exists in the same level and is greater than 2 blocks (2 * 2 = 4)
       if (this.level().dimension().equals(this.getOwner().level().dimension()) && targetPosDeltaSquared > 4) {
-
-        // smooth falloff in pull strength as the entity gets farther from the owner.
-        // double movementDampening = (double)1.0F - Math.sqrt(targetPosDeltaSquared) / (double)8.0F; // original
-
-        // double movementDampening = 1.0f; // ??? no dampening
-
-        // double movementDampening = -((double)1.0F - Math.sqrt(targetPosDeltaSquared) / (double)8.0F); // inverse ?? slow as we get closer ?
-
-
         this.setDeltaMovement(this.getDeltaMovement().add(targetPositionDelta.normalize().scale(movementDampening * movementDampening * 0.1)));
       }
+    } else {
+      double dampening = 0.5f;
+      RandomSource random = this.level().getRandom();
+      Vec3 movement = this.getDeltaMovement().add((random.nextFloat() * 2f) - 1f, (random.nextFloat() * 2f) - 1f, (random.nextFloat() * 2f) - 1f).scale(dampening * dampening * 0.1);
+      this.setDeltaMovement(movement);
     }
 
     this.move(MoverType.SELF, this.getDeltaMovement());
 
     // base friction factor for slowing in air or water
-    // float friction = 0.98F; // original
     float friction = 0.49F; // ?????
 
     // use friction provided by the block and normalize relative decay
@@ -311,17 +230,11 @@ public abstract class AbstractSpecter extends Mob implements TraceableEntity {
     }
 
     // apply friction to x-axis and z-axis, slightly dampen y-axis (reduce velocity over time)
-    this.setDeltaMovement(this.getDeltaMovement().multiply((double)friction, 0.98, (double)friction));
+    this.setDeltaMovement(this.getDeltaMovement().multiply(friction, 0.98, friction));
 
     // bouncy bouncy bouncy
     if (this.onGround()) {
-      this.setDeltaMovement(this.getDeltaMovement().multiply((double)1.0F, -0.9, (double)1.0F));
+      this.setDeltaMovement(this.getDeltaMovement().multiply(1.0F, -0.9, 1.0F));
     }
-
-//    // discard the entity after 5 minutes
-//    ++this.age;
-//    if (this.age >= 6000) {
-//      this.discard();
-//    }
   }
 }

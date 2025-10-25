@@ -2,13 +2,10 @@ package com.cursee.specter.impl.client.renderer.entity;
 
 import com.cursee.specter.SpecterCommon;
 import com.cursee.specter.impl.client.model.SpecterModel;
-import com.cursee.specter.impl.common.entity.AbstractSpecter;
 import com.cursee.specter.impl.common.entity.Specter;
 import com.cursee.specter.impl.common.registry.ModEntities;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import net.minecraft.client.color.block.BlockColors;
-import net.minecraft.client.color.item.ItemColors;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -19,10 +16,6 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.CommonColors;
-import net.minecraft.util.FastColor;
-import net.minecraft.util.FastColor.ARGB32;
-import net.minecraft.world.item.DyeColor;
 import org.jetbrains.annotations.NotNull;
 
 public class SpecterRenderer extends EntityRenderer<Specter> implements RenderLayerParent<Specter, EntityModel<Specter>> {
@@ -74,7 +67,7 @@ public class SpecterRenderer extends EntityRenderer<Specter> implements RenderLa
     // call to render method defined by our model
     // this.getModel().renderToBuffer(poseStack, buffer.getBuffer(RenderType.entityTranslucentCull(this.getTextureLocation(specter))), packedLight, OverlayTexture.NO_OVERLAY, 1, 1, 1, 1);
 
-    float[] diffuseColors = specter.getDyeColor().getTextureDiffuseColors();
+    float[] diffuseColors = specter.getDiffuseSpecterColors();
     this.getModel().renderToBuffer(poseStack, buffer.getBuffer(RenderType.entityTranslucentCull(this.getTextureLocation(specter))), packedLight, OverlayTexture.NO_OVERLAY, diffuseColors[0],
         diffuseColors[1], diffuseColors[2], 1.0f);
 

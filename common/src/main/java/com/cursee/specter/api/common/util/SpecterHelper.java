@@ -1,31 +1,34 @@
 package com.cursee.specter.api.common.util;
 
 import com.cursee.specter.impl.common.entity.Specter;
+import com.cursee.specter.impl.common.item.DyeableCondensedSpecterItem;
+import com.cursee.specter.impl.common.registry.ModItems;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.DyeableLeatherItem;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
 
 public class SpecterHelper {
 
-  /// Check a 65x8x65 area centered on the player for a Specter owned by the player
-  public static boolean hasOwnedSpecterNearby(Player player) {
+  /// Check a 65x8x65 area centered on the livingEntity for a Specter owned by the livingEntity
+  public static boolean hasOwnedSpecterNearby(LivingEntity livingEntity) {
 
-    if (player == null) {
+    if (livingEntity == null) {
       return false;
     }
 
-    Level level = player.level();
+    Level level = livingEntity.level();
     boolean foundOwnedSpecter = false;
-    List<Specter> specters = level.getNearbyEntities(Specter.class, TargetingConditions.DEFAULT, player, player.getBoundingBox().inflate(64.0D, 4D, 64.0D));
+    List<Specter> specters = level.getNearbyEntities(Specter.class, TargetingConditions.DEFAULT, livingEntity, livingEntity.getBoundingBox().inflate(64.0D, 4D, 64.0D));
 
     for (Specter specter : specters) {
-      if (specter.getOwner() == player) {
+      if (specter.getOwner() == livingEntity) {
         foundOwnedSpecter = true;
 
-        // stop searching if we found a specter owned by the player
+        // stop searching if we found a specter owned by the livingEntity
         break;
       }
     }
@@ -33,17 +36,48 @@ public class SpecterHelper {
     return foundOwnedSpecter;
   }
 
-  /// @param shieldingPlayer if false, defaults to {@link SpecterHelper#hasOwnedSpecterNearby(Player)}, otherwise checks if a Specter is close enough to shield the player.
-  public static boolean hasOwnedSpecterNearby(Specter specter, Player player, boolean shieldingPlayer) {
+  /// @param shieldingPlayer if false, defaults to {@link SpecterHelper#hasOwnedSpecterNearby(LivingEntity)}, otherwise checks if a Specter is close enough to shield the livingEntity.
+  public static boolean hasOwnedSpecterNearby(Specter specter, LivingEntity livingEntity, boolean shieldingPlayer) {
 
-    if (specter == null || player == null) {
+    if (specter == null || livingEntity == null) {
       return false;
     }
 
     if (!shieldingPlayer) {
-      return SpecterHelper.hasOwnedSpecterNearby(player);
+      return SpecterHelper.hasOwnedSpecterNearby(livingEntity);
     }
 
-    return specter.distanceTo(player) < 4.0f;
+    return specter.distanceTo(livingEntity) < 4.0f;
+  }
+
+  public static ItemStack convertSpecterToCondensedSpecter(Specter specter) {
+
+    ItemStack stack = new ItemStack(ModItems.CONDENSED_SPECTER);
+
+    if (specter.getSpecterColor() != DyeableCondensedSpecterItem.DEFAULT_SPECTER_COLOR) {
+      ((DyeableLeatherItem) stack.getItem()).setColor(stack, specter.getSpecterColor());
+    }
+
+    if (specter.hasCustomName()) {
+      stack.setHoverName(specter.getCustomName());
+    }
+
+    return stack;
+  }
+
+  public static @Nullable Specter convertCondensedSpecterToOwnedSpecter(LivingEntity living, ItemStack stack) {
+
+    if (!(stack.getItem() instanceof DyeableCondensedSpecterItem)) {
+      return null;
+    }
+
+    int spawnColor = DyeableCondensedSpecterItem.getColorFromStack(stack);
+    Specter specter = new Specter(living.level(), living, spawnColor);
+
+    if (stack.hasCustomHoverName()) {
+      specter.setCustomName(stack.getHoverName());
+    }
+
+    return specter;
   }
 }

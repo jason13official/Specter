@@ -9,7 +9,7 @@
       "item": "specter:specter_core"
     },
     "D": {
-      "tag": "specter:magenta_dyes"
+      "tag": "specter:wools"
     }
   },
   "pattern": [
@@ -18,7 +18,7 @@
     "D#D"
   ],
   "result": {
-    "item": "specter:specter_summoner_magenta"
+    "item": "specter:condensed_specter"
   },
   "show_notification": true
 }

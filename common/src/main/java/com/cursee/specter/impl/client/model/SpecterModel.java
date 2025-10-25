@@ -1,7 +1,6 @@
 package com.cursee.specter.impl.client.model;
 
 import com.cursee.specter.api.common.util.SpecterHelper;
-import com.cursee.specter.impl.common.entity.AbstractSpecter;
 import com.cursee.specter.impl.common.entity.Specter;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;

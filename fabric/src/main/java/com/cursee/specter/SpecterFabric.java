@@ -29,7 +29,7 @@ public class SpecterFabric implements ModInitializer {
 
     SpecterCommon.init();
 
-    // before integrated/dedicated server launch
+    // before integrated/dedicated server launch (attributes)
     FabricDefaultAttributeRegistry.register(ModEntities.SPECTER, Specter.createAttributes());
 
     ServerLifecycleEvents.SERVER_STARTING.register(SpecterServer::onServerStarting);
