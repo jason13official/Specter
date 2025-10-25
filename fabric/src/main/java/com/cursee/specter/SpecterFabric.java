@@ -1,11 +1,13 @@
 package com.cursee.specter;
 
+import com.cursee.specter.impl.common.registry.ModItems;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 
 public class SpecterFabric implements ModInitializer {
@@ -18,6 +20,7 @@ public class SpecterFabric implements ModInitializer {
   public void onInitialize() {
 
     // bind before common init
+    bind(BuiltInRegistries.ITEM, ModItems::register);
 
     SpecterCommon.init();
 

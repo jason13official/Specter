@@ -1,8 +1,10 @@
 package com.cursee.specter;
 
+import com.cursee.specter.impl.common.registry.ModItems;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -30,6 +32,7 @@ public class SpecterForge {
     SpecterForge.eventBus = context.getModEventBus();
 
     // bind before common init
+    bind(Registries.ITEM, ModItems::register);
 
     SpecterCommon.init();
 
